@@ -1,5 +1,5 @@
-# app.py — Streamlit: full IDA/EDA, pre/post-imputation heatmap toggle,
-# KDE/Violin/Scatter visuals, download. (Sticker/overlay removed)
+# app.py — Streamlit: IDA/EDA, pre/post-imputation heatmap with tuning,
+# KDE/Violin/Scatter, download. (No sticker/overlay code)
 import io
 import os
 import numpy as np
@@ -30,6 +30,11 @@ st.sidebar.subheader("EDA Controls")
 show_heatmap = st.sidebar.checkbox("Show Correlation Heatmap", value=True)
 exclude_bf_in_heatmap = st.sidebar.checkbox("Exclude BF from Heatmap", value=True)
 show_used_cols = st.sidebar.checkbox("Show heatmap variable list", value=False)
+
+# Heatmap tuning (NEW)
+st.sidebar.subheader("Heatmap Tuning")
+heatmap_scale = st.sidebar.slider("Cell size scale", 0.6, 1.8, 1.2, 0.1)
+heatmap_text = st.sidebar.slider("Text size", 6, 18, 11, 1)
 
 # Visual toggles
 st.sidebar.subheader("Visualizations")
@@ -213,7 +218,7 @@ def missing_table(df: pd.DataFrame):
 combined_clean_no_impute, art = prepare_and_merge(mlb_raw, cpbl_raw, BF_THRESHOLD)
 combined_imputed = impute_all(combined_clean_no_impute)
 
-# Sidebar kept counts (to match your screenshot style)
+# Sidebar kept counts
 st.sidebar.markdown("---")
 st.sidebar.write(
     f"MLB kept: {art['counts']['mlb_after']}/{art['counts']['mlb_before']} | "
@@ -233,7 +238,7 @@ with tab1:
   - **MLB:**  
     [Standard Pitching (MLB)](https://www.baseball-reference.com/leagues/majors/2025-standard-pitching.shtml),  
     [Advanced Pitching (MLB)](https://www.baseball-reference.com/leagues/majors/2025-advanced-pitching.shtml)  
-  - **CPBL (Chinese Profession Baseball League):**  
+  - **CPBL (中華職棒):**  
     [Brothers](https://www.rebas.tw/tournament/CPBL-2025-JO/firstbase/Kae1X-%E4%B8%AD%E4%BF%A1%E5%85%84%E5%BC%9F?tab=pitching) |  
     [Hawks](https://www.rebas.tw/tournament/CPBL-2025-JO/firstbase/t6zJf-%E5%8F%B0%E9%8B%BC%E9%9B%84%E9%B7%B9?tab=pitching) |  
     [Dragons](https://www.rebas.tw/tournament/CPBL-2025-JO/firstbase/R2VRh-%E5%91%B3%E5%85%A8%E9%BE%8D?tab=pitching) |  
@@ -246,6 +251,14 @@ with tab1:
 - **Imputation:** **KNNImputer for WAR** (features include BAbip) + **IterativeImputer** with team/league encodings  
 - **Outputs:** *before-imputation* vs *after-imputation* datasets for comparisons  
     """)
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown("**Combined (clean, before imputation) — head:**")
+        st.dataframe(combined_clean_no_impute.head())
+    with c2:
+        st.markdown("**Combined (after imputation) — head:**")
+        st.dataframe(combined_imputed.head())
+
 # --------------------------- IDA (Raw) ------------------------------
 with tab2:
     st.subheader("Initial Data Analysis (Raw files)")
@@ -323,15 +336,30 @@ with tab3:
                 with st.expander("Columns used in this heatmap"):
                     st.write(valid_corr_cols)
 
+            # 動態尺寸 + 文字大小 + 不使用容器自動寬度
+            n = len(valid_corr_cols)
+            cell = 0.85 * heatmap_scale
+            fig_w = max(8, cell * n + 2)
+            fig_h = max(6, cell * n + 2)
+            fig, ax = plt.subplots(figsize=(fig_w, fig_h), dpi=160)
+
             corr = numeric_df[valid_corr_cols].corr(method="pearson")
-            fig = plt.figure(figsize=(1 + 0.5*len(valid_corr_cols), 1 + 0.5*len(valid_corr_cols)))
             sns.heatmap(
-                corr, cmap="coolwarm", annot=True, fmt=".2f",
-                square=True, linewidths=0.5, cbar_kws={"shrink": 0.8}
+                corr,
+                cmap="coolwarm",
+                annot=True,
+                fmt=".2f",
+                square=True,
+                linewidths=0.5,
+                cbar_kws={"shrink": 0.8},
+                annot_kws={"size": heatmap_text},
+                ax=ax
             )
-            plt.title(f"Correlation Heatmap — {heatmap_choice}")
+            ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right", fontsize=heatmap_text)
+            ax.set_yticklabels(ax.get_yticklabels(), fontsize=heatmap_text)
+            ax.set_title(f"Correlation Heatmap — {heatmap_choice}", fontsize=heatmap_text + 2)
             plt.tight_layout()
-            st.pyplot(fig)
+            st.pyplot(fig, use_container_width=False)
 
 # --------------------------- Visualizations -------------------------
 with tab4:

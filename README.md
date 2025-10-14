@@ -75,3 +75,9 @@ The Streamlit dashboard currently supports:
 ## Acknowledgements
 - Baseball-Reference and Rebas.tw for public pitching statistics  
 - Streamlit, Plotly, and scikit-learn for data visualization and preprocessing tools
+
+---
+
+## Streamlit link
+
+https://cmse830projectpitchergit-sz7pq7q3u9wdu8m3hfqhgq.streamlit.app/

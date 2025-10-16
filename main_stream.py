@@ -411,7 +411,7 @@ with tab4:
 
         else:
             # 沒有任何自選隊伍 → 分聯盟各一張
-            st.markdown(f"### Team Violin Plot — {violin_metric}（Seaborn，分聯盟）")
+            st.markdown(f"### Team Violin Plot — {violin_metric}")
             for lg in ["MLB", "CPBL"]:
                 sub = filtered_df[(filtered_df["League"] == lg) & filtered_df[violin_metric].notna()]
                 if sub.empty: 
@@ -479,3 +479,4 @@ with tab5:
         file_name="combined_pitching_processed_filtered.csv",
         mime="text/csv"
     )
+

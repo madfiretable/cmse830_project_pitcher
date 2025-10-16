@@ -273,6 +273,25 @@ with tab1:
 - **Cleaning:** unify schema, compute SO/BB (CPBL), BF filter  
 - **Merge:** common cols + league-only cols, include **BAbip**  
 - **Imputation:** KNNImputer(WAR) + IterativeImputer(team/league-aware)
+- **Terms Explanation:**
+    | **Metric** | **Meaning / Definition** | **Interpretation** |
+    |-------------|--------------------------|--------------------|
+    | **BF** | Batters Faced — total number of hitters a pitcher has faced. | Measures workload; higher means more innings pitched. |
+    | **ERA** | Earned Run Average — earned runs allowed per 9 innings. | Lower ERA = better run prevention. |
+    | **ERA+** | Adjusted ERA — normalizes ERA for league and ballpark factors (100 = league average). | >100 = above average, <100 = below average. |
+    | **FIP** | Fielding Independent Pitching — focuses on outcomes under pitcher’s control (K, BB, HR, HBP). | Lower FIP = better true pitching skill. |
+    | **WHIP** | Walks + Hits per Inning Pitched. | Lower WHIP = fewer baserunners, better control. |
+    | **K%** | Strikeout Percentage — strikeouts ÷ batters faced × 100. | Higher K% = more dominant pitching. |
+    | **BB%** | Walk Percentage — walks ÷ batters faced × 100. | Lower BB% = better control and command. |
+    | **GB%** | Ground Ball Percentage — share of batted balls hit on the ground. | Higher GB% = induces weak contact, fewer HRs. |
+    | **FB%** | Fly Ball Percentage — share of batted balls hit in the air. | High FB% = more flyouts but greater HR risk. |
+    | **SO/BB** | Strikeout-to-Walk Ratio — strikeouts ÷ walks. | Higher ratio = efficient, dominant pitcher. |
+    | **BABIP** | Batting Average on Balls In Play — excludes HR and strikeouts. | ~.300 is typical; much higher/lower may suggest luck. |
+    | **WAR** | Wins Above Replacement — total value above a replacement-level player. | Higher WAR = greater overall contribution. |
+    | **HR/9** | Home Runs per 9 Innings — HR allowed × 9 ÷ innings pitched. | Lower HR/9 = better at limiting long balls. |
+    | **Whiff%** | Swinging Strike Rate — % of swings that miss completely. | High Whiff% = strong pitch movement/deception. |
+    | **Swing%** | Swing Rate — % of total pitches that batters swing at. | Shows how aggressive hitters are against the pitcher. |
+    | **PutAway%** | Putaway Rate — % of two-strike counts ending in strikeout. | High PutAway% = finishes hitters efficiently. |
     """)
     c1, c2 = st.columns(2)
     with c1:
@@ -281,6 +300,7 @@ with tab1:
     with c2:
         st.markdown("**Combined (after imputation) — head:**")
         st.dataframe(combined_imputed.head(), use_container_width=True)
+
 
 # --------------------------- IDA (Raw) ---------------------------
 with tab2:
@@ -479,4 +499,5 @@ with tab5:
         file_name="combined_pitching_processed_filtered.csv",
         mime="text/csv"
     )
+
 

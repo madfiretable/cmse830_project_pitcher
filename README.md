@@ -12,7 +12,7 @@ An interactive Streamlit app for **exploratory data analysis (EDA)** and **prepr
 - [Standard Pitching](https://www.baseball-reference.com/leagues/majors/2025-standard-pitching.shtml)  
 - [Advanced Pitching](https://www.baseball-reference.com/leagues/majors/2025-advanced-pitching.shtml)
 
-**CPBL (2025 JO):**
+**CPBL (2025 Chinese Professional Baseball league):**
 - [Brothers](https://www.rebas.tw/tournament/CPBL-2025-JO/firstbase/Kae1X-%E4%B8%AD%E4%BF%A1%E5%85%84%E5%BC%9F?tab=pitching)  
 - [Hawks](https://www.rebas.tw/tournament/CPBL-2025-JO/firstbase/t6zJf-%E5%8F%B0%E9%8B%BC%E9%9B%84%E9%B7%B9?tab=pitching)  
 - [Dragons](https://www.rebas.tw/tournament/CPBL-2025-JO/firstbase/R2VRh-%E5%91%B3%E5%85%A8%E9%BE%8D?tab=pitching)  

@@ -17,6 +17,32 @@ This project integrates multiple data sources to provide in-depth insights into 
 
 ---
 
+## Data Sources
+
+**MLB (2025):**
+- [Standard Pitching](https://www.baseball-reference.com/leagues/majors/2025-standard-pitching.shtml)  
+- [Advanced Pitching](https://www.baseball-reference.com/leagues/majors/2025-advanced-pitching.shtml)
+
+**CPBL (2025):**
+**CPBL (2025 Chinese Professional Baseball league):**
+- [Brothers](https://www.rebas.tw/tournament/CPBL-2025-JO/firstbase/Kae1X-%E4%B8%AD%E4%BF%A1%E5%85%84%E5%BC%9F?tab=pitching)  
+- [Hawks](https://www.rebas.tw/tournament/CPBL-2025-JO/firstbase/t6zJf-%E5%8F%B0%E9%8B%BC%E9%9B%84%E9%B7%B9?tab=pitching)  
+- [Dragons](https://www.rebas.tw/tournament/CPBL-2025-JO/firstbase/R2VRh-%E5%91%B3%E5%85%A8%E9%BE%8D?tab=pitching)  
+- [Guardians](https://www.rebas.tw/tournament/CPBL-2025-JO/firstbase/wi4T3-%E5%AF%8C%E9%82%A6%E6%82%8D%E5%B0%87?tab=pitching)  
+- [Monkeys](https://www.rebas.tw/tournament/CPBL-2025-JO/firstbase/WyADE-%E6%A8%82%E5%A4%A9%E6%A1%83%E7%8C%BF?tab=pitching)  
+- [Lions](https://www.rebas.tw/tournament/CPBL-2025-JO/firstbase/Xs1sP-%E7%B5%B1%E4%B8%807-ELEVEn%E7%8D%85?tab=pitching)
+
+**CPBL (2024):**
+**CPBL (2024 Chinese Professional Baseball league):**
+- [Brothers](https://www.rebas.tw/tournament/CPBL-2024-xa/firstbase/M45m3-%E4%B8%AD%E4%BF%A1%E5%85%84%E5%BC%9F?tab=pitching)  
+- [Hawks](https://www.rebas.tw/tournament/CPBL-2024-xa/firstbase/U64ee-%E5%8F%B0%E9%8B%BC%E9%9B%84%E9%B7%B9?tab=pitching)  
+- [Dragons](https://www.rebas.tw/tournament/CPBL-2024-xa/firstbase/BNi6c-%E5%91%B3%E5%85%A8%E9%BE%8D?tab=pitching)  
+- [Guardians](https://www.rebas.tw/tournament/CPBL-2024-xa/firstbase/uIOrj-%E5%AF%8C%E9%82%A6%E6%82%8D%E5%B0%87?tab=pitching)  
+- [Monkeys](https://www.rebas.tw/tournament/CPBL-2024-xa/firstbase/Iqkqa-%E6%A8%82%E5%A4%A9%E6%A1%83%E7%8C%BF?tab=pitching)  
+- [Lions](https://www.rebas.tw/tournament/CPBL-2024-xa/firstbase/GyWE7-%E7%B5%B1%E4%B8%807-ELEVEn%E7%8D%85?tab=pitching)
+
+---
+
 ## 🎯 Key Features
 
 ### 1. **Data Integration & Processing**

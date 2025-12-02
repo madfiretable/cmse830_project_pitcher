@@ -1,83 +1,362 @@
-# cmse830_project_pitcher
+# ⚾ Pitching Analytics Dashboard
+## MLB 2025 + CPBL 2024/2025 Performance Analysis
 
-An interactive Streamlit app for **exploratory data analysis (EDA)** and **preprocessing** of pitching stats from **MLB** and **CPBL (Chinese Professional Baseball League)**.
-
-> 📌 This project is part of a data science course requirement and demonstrates IDA/EDA and preprocessing steps through a Streamlit dashboard.
-
----
-
-## Data Sources
-
-**MLB (2025):**
-- [Standard Pitching](https://www.baseball-reference.com/leagues/majors/2025-standard-pitching.shtml)  
-- [Advanced Pitching](https://www.baseball-reference.com/leagues/majors/2025-advanced-pitching.shtml)
-
-**CPBL (2025 Chinese Professional Baseball league):**
-- [Brothers](https://www.rebas.tw/tournament/CPBL-2025-JO/firstbase/Kae1X-%E4%B8%AD%E4%BF%A1%E5%85%84%E5%BC%9F?tab=pitching)  
-- [Hawks](https://www.rebas.tw/tournament/CPBL-2025-JO/firstbase/t6zJf-%E5%8F%B0%E9%8B%BC%E9%9B%84%E9%B7%B9?tab=pitching)  
-- [Dragons](https://www.rebas.tw/tournament/CPBL-2025-JO/firstbase/R2VRh-%E5%91%B3%E5%85%A8%E9%BE%8D?tab=pitching)  
-- [Guardians](https://www.rebas.tw/tournament/CPBL-2025-JO/firstbase/wi4T3-%E5%AF%8C%E9%82%A6%E6%82%8D%E5%B0%87?tab=pitching)  
-- [Monkeys](https://www.rebas.tw/tournament/CPBL-2025-JO/firstbase/WyADE-%E6%A8%82%E5%A4%A9%E6%A1%83%E7%8C%BF?tab=pitching)  
-- [Lions](https://www.rebas.tw/tournament/CPBL-2025-JO/firstbase/Xs1sP-%E7%B5%B1%E4%B8%807-ELEVEn%E7%8D%85?tab=pitching)
+A comprehensive Streamlit-based analytics platform for analyzing and comparing pitcher performance across Major League Baseball (MLB) and Chinese Professional Baseball League (CPBL). This interactive dashboard provides advanced statistical analysis, machine learning predictions, and multi-dimensional visualizations for baseball analytics.
 
 ---
 
-## What the App Demonstrates
+## 📊 Project Overview
 
-- **EDA**
-  - League/team selection; quick stat summaries (ERA, WHIP, K/BB, etc.)
-  - Distributions & comparisons (histograms, box plots)
-  - Correlation heatmaps for numeric columns
-- **Preprocessing**
-  - Encoding: league & team → numeric (`OneHotEncoder`)
-  - Scaling: standardize numeric columns (`StandardScaler`)
-  - Imputation: handle missing values (`SimpleImputer`)
-  - Downloadable transformed dataset
+This project integrates multiple data sources to provide in-depth insights into pitcher performance metrics, featuring:
+
+- **Multi-league Analysis**: Combined MLB (2025) and CPBL (2024, 2025) data
+- **Advanced Metrics**: ERA+, FIP, WHIP, K%, BB%, WAR, and more
+- **Machine Learning Models**: Predictive analytics for WAR (Wins Above Replacement)
+- **Interactive Visualizations**: KDE plots, scatter grids, violin plots, correlation heatmaps
+- **Year-over-Year Comparisons**: Track performance trends across seasons
 
 ---
 
-## Progress Summary
+## 🎯 Key Features
 
-### **Why I Chose My Dataset**
-I chose to work with **pitching statistics from both Major League Baseball (MLB)** and **the Chinese Professional Baseball League (CPBL)** because they represent two different competitive environments and levels of play.  
-Comparing these leagues allows me to explore how pitcher performance metrics vary across different systems, player pools, and conditions. This makes the project meaningful for sports analytics and cross-league data analysis.
+### 1. **Data Integration & Processing**
+- Three distinct data sources (MLB 2025, CPBL 2024, CPBL 2025)
+- Advanced data cleaning and preprocessing
+- Two-stage imputation (KNN → Iterative Imputer)
+- BF (Batters Faced) threshold filtering
+- Unified schema across leagues
 
----
+### 2. **Exploratory Data Analysis**
+- Correlation heatmaps with customizable parameters
+- Interactive KDE (Kernel Density Estimation) plots by league/year
+- Team-based violin plots with year grouping
+- Multi-panel scatter grid (ERA+ vs other metrics)
+- Comprehensive statistical summaries
 
-### **What I’ve Learned from IDA/EDA**
-Through exploratory data analysis, I found that:
-- **ERA, WHIP, and K/BB ratio** are key performance indicators that show clear variation between MLB and CPBL.
-- **CPBL pitchers** tend to have more variance in earned run averages, while **MLB pitchers** cluster more tightly.
-- Visual tools like **histograms, box plots, and correlation heatmaps** helped me spot potential multicollinearity (e.g., between innings pitched and strikeouts).
-- Integrating data from different sources taught me practical skills in **data cleaning, renaming inconsistent columns, and handling missing values.**
+### 3. **Feature Engineering**
+- ERA+ normalization (league-adjusted)
+- SO/BB ratio calculation
+- Team_YY (Team + Year) composite features
+- Percentage-based metrics (K%, BB%, GB%, FB%)
+- Advanced missing value handling
 
----
+### 4. **Machine Learning Models**
+- **Linear Regression**: Feature coefficient analysis
+- **Random Forest Regressor**: Feature importance ranking
+- WAR prediction with comprehensive evaluation metrics
+- Model comparison with R² and MAE scores
 
-### **What Preprocessing Steps I’ve Completed**
-The preprocessing workflow includes:
-- **Imputation:** Replacing missing numeric values using `SimpleImputer(strategy="median")`
-- **Encoding:** Converting categorical variables (`league`, `team`) with `OneHotEncoder`
-- **Scaling:** Standardizing numeric columns such as ERA, WHIP, SO, BB, and IP using `StandardScaler`
-- All steps are combined using a **`ColumnTransformer` pipeline**, and the app allows users to **download the transformed dataset**.
-
----
-
-### **What I’ve Tried with Streamlit So Far**
-The Streamlit dashboard currently supports:
-- **Automatic data loading** (from CSV or live scraping via `pandas.read_html`)
-- **Interactive controls** for selecting datasets and metrics
-- **Dynamic visualizations** with Plotly (histogram, box plot, heatmap)
-- **Preprocessing demo** with live preview of encoded and scaled features
-- **Download button** for exporting the cleaned and transformed dataset
-
----
-
-## Acknowledgements
-- Baseball-Reference and Rebas.tw for public pitching statistics  
-- Streamlit, Plotly, and scikit-learn for data visualization and preprocessing tools
+### 5. **Interactive Dashboard**
+- 5 organized tabs (Overview, IDA, EDA, Visualizations, Download)
+- Dynamic filtering (League, Team, Year, BF threshold)
+- Customizable visualization parameters
+- Real-time data exploration
+- Export functionality for processed data
 
 ---
 
-## Streamlit link
+## 🛠️ Technology Stack
 
-https://cmse830projectpitchergit-sz7pq7q3u9wdu8m3hfqhgq.streamlit.app/
+- **Python 3.8+**
+- **Streamlit**: Interactive web application framework
+- **Pandas & NumPy**: Data manipulation and analysis
+- **Scikit-learn**: Machine learning models and preprocessing
+- **Plotly**: Interactive visualizations
+- **Matplotlib & Seaborn**: Statistical plotting
+
+---
+
+## 📦 Installation
+
+### Prerequisites
+- Python 3.8 or higher
+- pip package manager
+
+### Setup Instructions
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/yourusername/pitching-analytics.git
+cd pitching-analytics
+```
+
+2. **Create a virtual environment (recommended)**
+```bash
+# Windows
+python -m venv venv
+venv\Scripts\activate
+
+# macOS/Linux
+python3 -m venv venv
+source venv/bin/activate
+```
+
+3. **Install required packages**
+```bash
+pip install -r requirements.txt
+```
+
+4. **Prepare data files**
+Place the following files in the project directory:
+- `MLB_Pitch.csv` - MLB 2025 pitching data
+- `投手2024.csv` - CPBL 2024 pitching data
+- `投手.xlsx` - CPBL 2025 pitching data
+
+---
+
+## 🚀 Usage
+
+### Running the Application
+
+```bash
+streamlit run test_stream.py
+```
+
+The application will launch in your default web browser at `http://localhost:8501`
+
+### Navigation Guide
+
+#### **Tab 1: Overview**
+- View data sources and processing pipeline
+- Terms explanation for all metrics
+- Preview of raw and imputed data
+
+#### **Tab 2: IDA (Initial Data Analysis)**
+- Raw data statistics and summaries
+- Missing value analysis
+- Data quality checks
+
+#### **Tab 3: EDA (Exploratory Data Analysis)**
+- Correlation heatmap with customizable settings
+- Statistical summaries by league
+- Distribution analysis
+
+#### **Tab 4: Visualizations**
+- **KDE Plots**: Distribution comparison across leagues/years
+- **Violin Plots**: Team performance distributions
+- **Scatter Grid**: ERA+ correlations with other metrics
+- **WAR Prediction Models**: ML model results and insights
+
+#### **Tab 5: Download**
+- Export processed and filtered data as CSV
+
+### Interactive Controls
+
+**Sidebar Settings:**
+- **BF Threshold**: Filter pitchers by minimum batters faced
+- **League Filter**: Select MLB, CPBL, or both
+- **Year Filter**: Choose 2024, 2025, or both
+- **Visualization Options**: Toggle different plot types
+- **Heatmap Tuning**: Adjust cell size and text size
+
+---
+
+## 📈 Metrics Explained
+
+| Metric | Definition | Interpretation |
+|--------|------------|----------------|
+| **ERA** | Earned Run Average | Lower = better run prevention |
+| **ERA+** | Adjusted ERA (100 = league avg) | >100 = above average |
+| **FIP** | Fielding Independent Pitching | Lower = better pitching skill |
+| **WHIP** | Walks + Hits per Inning | Lower = better control |
+| **K%** | Strikeout Percentage | Higher = more dominant |
+| **BB%** | Walk Percentage | Lower = better command |
+| **WAR** | Wins Above Replacement | Higher = greater value |
+| **SO/BB** | Strikeout-to-Walk Ratio | Higher = more efficient |
+
+*See full metrics table in the Overview tab*
+
+---
+
+## 🔬 Data Processing Pipeline
+
+```
+1. Data Loading
+   ├── MLB 2025 (CSV)
+   ├── CPBL 2024 (CSV)
+   └── CPBL 2025 (XLSX)
+   
+2. Data Cleaning
+   ├── Schema unification
+   ├── Type conversion
+   └── Duplicate removal
+   
+3. Feature Engineering
+   ├── ERA+ calculation
+   ├── SO/BB ratio
+   └── Percentage metrics
+   
+4. Missing Value Imputation
+   ├── Stage 1: KNN Imputer
+   └── Stage 2: Iterative Imputer
+   
+5. Filtering
+   └── BF threshold application
+   
+6. Ready for Analysis & Modeling
+```
+
+---
+
+## 🤖 Machine Learning Approach
+
+### Model Selection Rationale
+
+**Linear Regression:**
+- Interpretable coefficients
+- Fast training and prediction
+- Good baseline for feature importance
+
+**Random Forest Regressor:**
+- Handles non-linear relationships
+- Robust to outliers
+- Feature importance ranking
+- Better predictive performance
+
+### Evaluation Metrics
+- **R² Score**: Proportion of variance explained
+- **MAE (Mean Absolute Error)**: Average prediction error
+
+### Features Used
+- ERA, ERA+, FIP, WHIP
+- K%, BB%, SO/BB
+- HR9, BAbip, GB%, FB%
+
+---
+
+## 📁 Project Structure
+
+```
+pitching-analytics/
+│
+├── test_stream.py           # Main Streamlit application
+├── requirements.txt         # Python dependencies
+├── README.md               # Project documentation
+│
+├── data/                   # Data directory (not in repo)
+│   ├── MLB_Pitch.csv
+│   ├── 投手2024.csv
+│   └── 投手.xlsx
+│
+└── outputs/                # Generated outputs
+    └── combined_pitching_processed_filtered.csv
+```
+
+---
+
+## 🎨 Visualization Examples
+
+### Correlation Heatmap
+- Identifies relationships between pitching metrics
+- Customizable color scale and size
+- Option to exclude BF from analysis
+
+### KDE Plots
+- Compare metric distributions across leagues
+- Year-over-year trends visualization
+- Interactive variable selection
+
+### Scatter Grid
+- ERA+ vs multiple metrics in one view
+- Color-coded by team
+- Shape-coded by year (circle=2024, square=2025)
+
+### Violin Plots
+- Team performance distributions
+- League-specific comparisons
+- Custom team selection
+
+---
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+**Issue**: `AttributeError: 'numpy.ndarray' object has no attribute 'fillna'`
+- **Solution**: Ensure you're using the latest version of the code with proper Series conversion
+
+**Issue**: App doesn't update after code changes
+- **Solution**: 
+  - Stop Streamlit (Ctrl+C)
+  - Restart: `streamlit run test_stream.py`
+  - Or press 'R' in browser to rerun
+
+**Issue**: Missing data files
+- **Solution**: Ensure all three data files are in the correct directory with exact filenames
+
+**Issue**: Memory errors with large datasets
+- **Solution**: Increase BF threshold to reduce dataset size
+
+---
+
+## 📊 Data Requirements
+
+### MLB Data (MLB_Pitch.csv)
+Expected columns: Player, Team, ERA, FIP, WHIP, K%, BB%, WAR, BF, etc.
+
+### CPBL Data (投手2024.csv, 投手.xlsx)
+Expected columns: 球員 (Player), 球隊 (Team), 防禦率 (ERA), 投球局數 (IP), 三振 (K), 保送 (BB), etc.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+### Development Guidelines
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+## 📝 Future Enhancements
+
+- [ ] Add player comparison tool
+- [ ] Implement pitch type analysis
+- [ ] Include injury data integration
+- [ ] Add predictive modeling for ERA+
+- [ ] Export visualizations as images
+- [ ] Add more ML models (XGBoost, Neural Networks)
+- [ ] Implement cross-validation visualization
+- [ ] Add season prediction capabilities
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+## 👨‍💻 Author
+
+**Your Name**
+- GitHub: [@yourusername](https://github.com/yourusername)
+- Email: your.email@example.com
+
+---
+
+## 🙏 Acknowledgments
+
+- MLB for providing comprehensive pitching statistics
+- CPBL for baseball data
+- Streamlit community for excellent documentation
+- Scikit-learn for machine learning tools
+
+---
+
+## 📞 Support
+
+For questions or issues:
+1. Check the Troubleshooting section
+2. Open an issue on GitHub
+3. Contact via email
+
+---
+
+**Last Updated**: December 2024
+
+**Version**: 3.0 - Multi-Year, Year-aware Visualizations

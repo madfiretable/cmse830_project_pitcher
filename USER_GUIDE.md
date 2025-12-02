@@ -440,9 +440,8 @@
 1. Check troubleshooting section above
 2. Review documentation files
 3. Open GitHub issue
-4. Contact via email
 
 ---
 
-**Last Updated**: December 2024  
+**Last Updated**: December 2025  
 **App Version**: 3.0

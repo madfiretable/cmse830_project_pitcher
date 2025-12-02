@@ -325,20 +325,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ---
 
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
----
-
-## 👨‍💻 Author
-
-**Your Name**
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Email: your.email@example.com
-
----
-
 ## 🙏 Acknowledgments
 
 - MLB for providing comprehensive pitching statistics
@@ -348,15 +334,3 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-## 📞 Support
-
-For questions or issues:
-1. Check the Troubleshooting section
-2. Open an issue on GitHub
-3. Contact via email
-
----
-
-**Last Updated**: December 2024
-
-**Version**: 3.0 - Multi-Year, Year-aware Visualizations

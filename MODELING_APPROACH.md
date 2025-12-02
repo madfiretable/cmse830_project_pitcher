@@ -423,6 +423,6 @@ def predict_war(pitcher_stats):
 
 ---
 
-**Last Updated**: December 2024  
+**Last Updated**: December 2025
 **Version**: 1.0  
-**Author**: Your Name
+**Author**: Cheng-Lun Lee

@@ -713,7 +713,7 @@ with tab4:
                             "Team: %{customdata[1]}<br>"
                             "Year: %{customdata[2]}<br>"
                             f"{xcol}: %{{x:.2f}}<br>"
-                            "ERA+: %{{y:.2f}}<extra></extra>"
+                            "ERA+: %{y:.2f}<extra></extra>"
                         ),
                         showlegend=False,
                     ),
@@ -813,3 +813,4 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
+

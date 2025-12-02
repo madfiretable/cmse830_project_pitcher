@@ -385,7 +385,56 @@ with tab1:
     4. Compute SO/BB (CPBL)  
     5. BF threshold  
     6. Imputation (KNN → Iterative Imputer)  
+    
+    ### **Terms Explanation**
     """)
+    
+    # Create metrics explanation dataframe
+    metrics_data = {
+        "Metric": [
+            "BF", "ERA", "ERA+", "FIP", "WHIP", "K%", "BB%", "GB%", "FB%", 
+            "SO/BB", "BABIP", "WAR", "HR/9", "Whiff%", "Swing%", "PutAway%"
+        ],
+        "Meaning / Definition": [
+            "Batters Faced — total number of hitters a pitcher has faced.",
+            "Earned Run Average — earned runs allowed per 9 innings.",
+            "Adjusted ERA — normalizes ERA for league and ballpark factors (100 = league average).",
+            "Fielding Independent Pitching — focuses on outcomes under pitcher's control (K, BB, HR, HBP).",
+            "Walks + Hits per Inning Pitched.",
+            "Strikeout Percentage — strikeouts ÷ batters faced × 100.",
+            "Walk Percentage — walks ÷ batters faced × 100.",
+            "Ground Ball Percentage — share of batted balls hit on the ground.",
+            "Fly Ball Percentage — share of batted balls hit in the air.",
+            "Strikeout-to-Walk Ratio — strikeouts ÷ walks.",
+            "Batting Average on Balls In Play — excludes HR and strikeouts.",
+            "Wins Above Replacement — total value above a replacement-level player.",
+            "Home Runs per 9 Innings — HR allowed × 9 ÷ innings pitched.",
+            "Swinging Strike Rate — % of swings that miss completely.",
+            "Swing Rate — % of total pitches that batters swing at.",
+            "Putaway Rate — % of two-strike counts ending in strikeout."
+        ],
+        "Interpretation": [
+            "Measures workload; higher means more innings pitched.",
+            "Lower ERA = better run prevention.",
+            ">100 = above average, <100 = below average.",
+            "Lower FIP = better true pitching skill.",
+            "Lower WHIP = fewer baserunners, better control.",
+            "Higher K% = more dominant pitching.",
+            "Lower BB% = better control and command.",
+            "Higher GB% = induces weak contact, fewer HRs.",
+            "High FB% = more flyouts but greater HR risk.",
+            "Higher ratio = efficient, dominant pitcher.",
+            "~.300 is typical; much higher/lower may suggest luck.",
+            "Higher WAR = greater overall contribution.",
+            "Lower HR/9 = better at limiting long balls.",
+            "High Whiff% = strong pitch movement/deception.",
+            "Shows how aggressive hitters are against the pitcher.",
+            "High PutAway% = finishes hitters efficiently."
+        ]
+    }
+    
+    metrics_df = pd.DataFrame(metrics_data)
+    st.dataframe(make_arrow_safe(metrics_df), use_container_width=True, hide_index=True)
 
     c1, c2 = st.columns(2)
     with c1:

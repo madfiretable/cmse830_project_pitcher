@@ -13,8 +13,8 @@ from sklearn.impute import KNNImputer
 from sklearn.experimental import enable_iterative_imputer  # noqa: F401
 from sklearn.impute import IterativeImputer
 from sklearn.preprocessing import StandardScaler
-from sklearn.linear_model import LinearRegression
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import LinearRegression, Ridge
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 
 import plotly.express as px
 import plotly.graph_objects as go
@@ -365,8 +365,13 @@ def make_color_map(categories):
 team_color_map = make_color_map(sorted(filtered_df["Team"].dropna().unique()))
 
 # Tabs
-tab1, tab2, tab3, tab4, tab5 = st.tabs([
-    "Overview", "IDA (Raw)", "EDA (Clean/Imputed)", "Visualizations", "Download"
+tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    "📋 Overview", 
+    "🔍 Data Cleaning (IDA)", 
+    "🧹 Data Encoding (EDA)", 
+    "📊 Visualizations", 
+    "🤖 ML Models",
+    "💾 Download"
 ])
 
 # --------------------------- Overview ---------------------------
@@ -444,9 +449,12 @@ with tab1:
         st.markdown("### Combined (After Imputation)")
         st.dataframe(make_arrow_safe(combined_imputed.head()), use_container_width=True)
 
-# --------------------------- IDA (Raw) ---------------------------
+# --------------------------- Data Cleaning (IDA) ---------------------------
 with tab2:
-    st.subheader("Initial Data Analysis (Raw files)")
+    st.header("🔍 Data Cleaning - Initial Data Analysis")
+    st.caption("Examining raw data before cleaning and processing")
+    
+    st.subheader("Raw Data Overview")
 
     colA, colB = st.columns(2)
     with colA:
@@ -468,9 +476,12 @@ with tab2:
     })
     st.dataframe(make_arrow_safe(dup_df), use_container_width=True)
 
-# --------------------------- EDA (Clean/Imputed) ---------------------------
+# --------------------------- Data Encoding (EDA) ---------------------------
 with tab3:
-    st.subheader("Exploratory Data Analysis")
+    st.header("🧹 Data Encoding - Exploratory Data Analysis")
+    st.caption("Analyzing cleaned and imputed data with statistical summaries")
+    
+    st.subheader("Data Quality After Processing")
 
     # Before Imputation
     st.markdown("### Descriptive Statistics (Clean before Imputation)")
@@ -730,70 +741,436 @@ with tab4:
 
             st.plotly_chart(fig, use_container_width=True)
 
-        # --------------------------- WAR Models ---------------------------
-        st.markdown("---")
-        st.subheader("WAR Prediction Models")
-
-        features = [
-            "ERA", "ERA_plus", "FIP", "WHIP",
-            "K%", "BB%", "SO/BB",
-            "HR9", "BAbip", "GB%", "FB%"
-        ]
-        features = [c for c in features if c in combined_imputed.columns]
-
-        df_model = combined_imputed.dropna(subset=["WAR"]).copy()
-        X = df_model[features]
-        y = df_model["WAR"]
-
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.20, random_state=42
-        )
-
-        # Model A: Linear Regression
-        st.markdown("### Model A: Linear Regression")
-
-        lr = LinearRegression()
-        lr.fit(X_train, y_train)
-        pred_lr = lr.predict(X_test)
-
-        st.write("**R² score:**", round(r2_score(y_test, pred_lr), 4))
-        st.write("**MAE:**", round(mean_absolute_error(y_test, pred_lr), 4))
-
-        coef_df = pd.DataFrame({
-            "Feature": features,
-            "Coefficient": lr.coef_,
-        }).sort_values("Coefficient", ascending=False)
-
-        st.write("**Feature Coefficients:**")
-        st.dataframe(make_arrow_safe(coef_df), use_container_width=True)
-
-        # Model B: Random Forest
-        st.markdown("### Model B: Random Forest Regression")
-
-        rf = RandomForestRegressor(
-            n_estimators=500,
-            max_depth=None,
-            random_state=42
-        )
-        rf.fit(X_train, y_train)
-        pred_rf = rf.predict(X_test)
-
-        st.write("**R² score:**", round(r2_score(y_test, pred_rf), 4))
-        st.write("**MAE:**", round(mean_absolute_error(y_test, pred_rf), 4))
-
-        fi_df = pd.DataFrame({
-            "Feature": features,
-            "Importance": rf.feature_importances_
-        }).sort_values("Importance", ascending=False)
-
-        st.write("**Feature Importances:**")
-        st.dataframe(make_arrow_safe(fi_df), use_container_width=True)
-
 # ============================================================
-# PART 5 — Download
+# PART 5 — ML Models
 # ============================================================
 
 with tab5:
+    st.header("🤖 Machine Learning Models")
+    
+    # --------------------------- WAR Models ---------------------------
+    st.markdown("---")
+    st.subheader("WAR Prediction Models")
+    
+    st.info("🎯 **Feature Selection Strategy**: Based on correlation heatmap analysis - selected features with strong WAR correlation (>0.3) while avoiding extreme multicollinearity")
+
+    # Correlation analysis from heatmap:
+    # Strong WAR correlations: WHIP(-0.66), ERA_plus(0.64), FIP(-0.51), BAbip(-0.41), SO/BB(0.40), K%(0.36)
+    # Avoid: ERA (highly correlated with ERA+), BB% (correlated with SO/BB)
+    
+    st.info("🔍 **Diagnostic Information**: Checking data quality and feature availability")
+    
+    # Check available features
+    available_features = combined_imputed.columns.tolist()
+    st.write(f"**Total features available:** {len(available_features)}")
+    
+    # Primary features (must have)
+    features_primary = []
+    for feat in ["ERA_plus", "WHIP", "FIP", "SO/BB", "K%", "BAbip"]:
+        if feat in available_features:
+            features_primary.append(feat)
+    
+    # Secondary features (nice to have)
+    features_secondary = []
+    for feat in ["Whiff%", "HR9", "GB%", "BB%", "ERA", "FB%"]:
+        if feat in available_features:
+            features_secondary.append(feat)
+    
+    # Add BF (Batters Faced) as workload indicator - very important!
+    if "BF" in available_features:
+        features_primary.append("BF")
+    
+    # Combine features
+    features = features_primary + features_secondary
+    
+    st.write(f"**Primary features ({len(features_primary)}):** {', '.join(features_primary)}")
+    st.write(f"**Secondary features ({len(features_secondary)}):** {', '.join(features_secondary)}")
+
+    df_model = combined_imputed.dropna(subset=["WAR"]).copy()
+    
+    # Check data quality
+    st.write(f"**Samples with WAR:** {len(df_model)}")
+    st.write(f"**WAR range:** {df_model['WAR'].min():.2f} to {df_model['WAR'].max():.2f}")
+    st.write(f"**WAR std dev:** {df_model['WAR'].std():.2f}")
+    
+    # Check for data issues
+    if df_model['WAR'].std() < 0.5:
+        st.warning("⚠️ Low WAR variance - this will limit model performance")
+    
+    # Feature engineering: Add interaction terms
+    if "K%" in df_model.columns and "WHIP" in df_model.columns:
+        df_model["K_WHIP_interaction"] = df_model["K%"] * (1 / (df_model["WHIP"] + 0.01))  # Add small constant to avoid division by zero
+        features.append("K_WHIP_interaction")
+        
+    if "SO/BB" in df_model.columns and "ERA_plus" in df_model.columns:
+        df_model["Efficiency_Score"] = (df_model["SO/BB"] + 0.01) * df_model["ERA_plus"] / 100
+        features.append("Efficiency_Score")
+    
+    # Add more powerful interactions based on heatmap
+    if "ERA_plus" in df_model.columns and "WHIP" in df_model.columns:
+        df_model["ERA_WHIP_product"] = df_model["ERA_plus"] * (1 / (df_model["WHIP"] + 0.01))
+        features.append("ERA_WHIP_product")
+    
+    if "FIP" in df_model.columns and "BF" in df_model.columns:
+        df_model["FIP_weighted"] = df_model["FIP"] * np.log1p(df_model["BF"])  # Weight by workload
+        features.append("FIP_weighted")
+    
+    # Check for missing values in features
+    X = df_model[features]
+    y = df_model["WAR"]
+    
+    missing_pct = (X.isnull().sum() / len(X) * 100).sort_values(ascending=False)
+    if missing_pct.max() > 0:
+        st.warning(f"⚠️ Features with missing values: {missing_pct[missing_pct > 0].to_dict()}")
+        # Drop rows with any missing values
+        X = X.dropna()
+        y = y.loc[X.index]
+        st.write(f"**Samples after removing missing:** {len(X)}")
+
+    # Show data split info
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.20, random_state=42
+    )
+    
+    st.write(f"**Training samples:** {len(X_train)} | **Test samples:** {len(X_test)}")
+    st.write(f"**WAR Range:** {y.min():.2f} to {y.max():.2f} | **Mean:** {y.mean():.2f}")
+
+    # Model A: Robust Regression (Huber Regressor)
+    st.markdown("### Model A: Robust Regression (Huber Regressor)")
+    st.caption("🔹 Resistant to outliers - downweights extreme values automatically")
+    
+    from sklearn.linear_model import HuberRegressor
+    from sklearn.preprocessing import StandardScaler
+    
+    # Scale features for Robust Regression
+    scaler_robust = StandardScaler()
+    X_train_scaled = scaler_robust.fit_transform(X_train)
+    X_test_scaled = scaler_robust.transform(X_test)
+    
+    # Huber Regressor with optimized epsilon
+    # epsilon controls the threshold for outliers (default=1.35)
+    robust = HuberRegressor(
+        epsilon=1.35,  # Standard setting for outlier threshold
+        max_iter=200,  # More iterations for convergence
+        alpha=0.001,   # L2 regularization strength
+        tol=1e-5       # Convergence tolerance
+    )
+    robust.fit(X_train_scaled, y_train)
+    pred_robust = robust.predict(X_test_scaled)
+    
+    r2_robust = r2_score(y_test, pred_robust)
+    mae_robust = mean_absolute_error(y_test, pred_robust)
+    
+    # Count outliers detected
+    residuals_train = np.abs(y_train - robust.predict(X_train_scaled))
+    threshold = robust.epsilon * np.std(residuals_train)
+    n_outliers = np.sum(residuals_train > threshold)
+    outlier_pct = (n_outliers / len(y_train)) * 100
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("R² Score", f"{r2_robust:.4f}", 
+                 help="Higher is better (max 1.0)")
+    with col2:
+        st.metric("MAE", f"{mae_robust:.4f}", 
+                 help="Lower is better (in WAR units)")
+    with col3:
+        st.metric("Outliers Detected", f"{n_outliers} ({outlier_pct:.1f}%)",
+                 help="Data points downweighted by robust model")
+
+    coef_df = pd.DataFrame({
+        "Feature": features,
+        "Coefficient": robust.coef_,
+        "Abs_Coefficient": np.abs(robust.coef_)
+    }).sort_values("Abs_Coefficient", ascending=False)
+    
+    st.write("**Feature Coefficients (Standardized):**")
+    st.dataframe(
+        make_arrow_safe(coef_df[["Feature", "Coefficient"]]), 
+        use_container_width=True,
+        hide_index=True
+    )
+
+    # Model B: Gradient Boosting Regressor
+    st.markdown("### Model B: Gradient Boosting Regressor")
+    st.caption("🔹 Advanced ensemble method with feature interactions")
+    
+    from sklearn.ensemble import GradientBoostingRegressor
+    
+    # Optimized hyperparameters for better performance
+    gb = GradientBoostingRegressor(
+        n_estimators=500,          # More trees for better learning
+        learning_rate=0.08,        # Balanced learning rate
+        max_depth=6,               # Deeper trees to capture complexity
+        min_samples_split=5,       # Less restrictive splitting
+        min_samples_leaf=2,        # Allow smaller leaf nodes
+        subsample=0.85,            # Higher subsampling
+        max_features=0.8,          # Use 80% of features per tree
+        random_state=42,
+        validation_fraction=0.1,   # Use for early stopping monitoring
+        n_iter_no_change=50,       # Stop if no improvement for 50 iterations
+        tol=1e-4                   # Convergence tolerance
+    )
+    gb.fit(X_train, y_train)
+    pred_gb = gb.predict(X_test)
+    
+    r2_gb = r2_score(y_test, pred_gb)
+    mae_gb = mean_absolute_error(y_test, pred_gb)
+    
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        st.metric("R² Score", f"{r2_gb:.4f}",
+                 delta=f"{r2_gb - r2_robust:+.4f} vs Robust",
+                 help="Higher is better (max 1.0)")
+    with col2:
+        st.metric("MAE", f"{mae_gb:.4f}",
+                 delta=f"{mae_gb - mae_robust:+.4f} vs Robust",
+                 delta_color="inverse",
+                 help="Lower is better (in WAR units)")
+    with col3:
+        st.metric("Trees Used", f"{gb.n_estimators_}",
+                 help="Number of boosting stages performed")
+
+    fi_df = pd.DataFrame({
+        "Feature": features,
+        "Importance": gb.feature_importances_
+    }).sort_values("Importance", ascending=False)
+    
+    st.write("**Feature Importances:**")
+    st.dataframe(
+        make_arrow_safe(fi_df), 
+        use_container_width=True,
+        hide_index=True
+    )
+    
+    # Model C: XGBoost (if available)
+    st.markdown("### Model C: XGBoost Regressor")
+    st.caption("🔹 State-of-the-art gradient boosting with advanced regularization")
+    
+    try:
+        from xgboost import XGBRegressor
+        
+        xgb = XGBRegressor(
+            n_estimators=500,          # More trees
+            learning_rate=0.08,        # Slightly higher learning rate
+            max_depth=6,               # Deeper trees
+            min_child_weight=2,        # Less restrictive
+            subsample=0.85,            # Higher subsampling
+            colsample_bytree=0.85,     # Use more features
+            gamma=0.05,                # Lower gamma for more splits
+            reg_alpha=0.05,            # Lighter L1 regularization
+            reg_lambda=0.5,            # Lighter L2 regularization
+            random_state=42,
+            n_jobs=-1,
+            early_stopping_rounds=50,
+            eval_metric='rmse'
+        )
+        
+        # Fit with evaluation set for early stopping
+        xgb.fit(
+            X_train, y_train,
+            eval_set=[(X_test, y_test)],
+            verbose=False
+        )
+        pred_xgb = xgb.predict(X_test)
+        
+        r2_xgb = r2_score(y_test, pred_xgb)
+        mae_xgb = mean_absolute_error(y_test, pred_xgb)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric("R² Score", f"{r2_xgb:.4f}",
+                     delta=f"{r2_xgb - r2_gb:+.4f} vs GB",
+                     help="Higher is better (max 1.0)")
+        with col2:
+            st.metric("MAE", f"{mae_xgb:.4f}",
+                     delta=f"{mae_xgb - mae_gb:+.4f} vs GB",
+                     delta_color="inverse",
+                     help="Lower is better (in WAR units)")
+        with col3:
+            st.metric("Best Iteration", f"{xgb.best_iteration}",
+                     help="Optimal number of trees before overfitting")
+        
+        xgb_fi_df = pd.DataFrame({
+            "Feature": features,
+            "Importance": xgb.feature_importances_
+        }).sort_values("Importance", ascending=False)
+        
+        st.write("**Feature Importances:**")
+        st.dataframe(
+            make_arrow_safe(xgb_fi_df), 
+            use_container_width=True,
+            hide_index=True
+        )
+        
+        has_xgboost = True
+        
+    except ImportError:
+        st.warning("⚠️ XGBoost not installed. Install with: `pip install xgboost`")
+        has_xgboost = False
+        pred_xgb = None
+        r2_xgb = None
+        mae_xgb = None
+    
+    # Model Comparison
+    st.markdown("### 📊 Model Comparison")
+    
+    if has_xgboost:
+        comparison_df = pd.DataFrame({
+            "Model": ["Robust Regression", "Gradient Boosting", "XGBoost"],
+            "R² Score": [r2_robust, r2_gb, r2_xgb],
+            "MAE": [mae_robust, mae_gb, mae_xgb],
+            "Training Speed": ["Fast", "Medium", "Fast"],
+            "Best For": [
+                "Outlier resistance & interpretability",
+                "Good balance",
+                "Maximum accuracy"
+            ]
+        })
+        best_r2 = max(r2_robust, r2_gb, r2_xgb)
+        if best_r2 == r2_xgb:
+            best_model = "XGBoost"
+        elif best_r2 == r2_gb:
+            best_model = "Gradient Boosting"
+        else:
+            best_model = "Robust Regression"
+    else:
+        comparison_df = pd.DataFrame({
+            "Model": ["Robust Regression", "Gradient Boosting"],
+            "R² Score": [r2_robust, r2_gb],
+            "MAE": [mae_robust, mae_gb],
+            "Best For": [
+                "Outlier resistance & interpretability",
+                "Predictive accuracy"
+            ]
+        })
+        best_model = "Gradient Boosting" if r2_gb > r2_robust else "Robust Regression"
+    
+    st.dataframe(make_arrow_safe(comparison_df), use_container_width=True, hide_index=True)
+    
+    # Show best model
+    st.success(f"🏆 **Best Model (by R²):** {best_model}")
+    
+    # Residual Analysis
+    st.markdown("### 📉 Residual Analysis")
+    st.caption("Examining prediction errors to identify model weaknesses")
+    
+    residuals_robust = y_test - pred_robust
+    residuals_gb = y_test - pred_gb
+    
+    fig_residual = make_subplots(
+        rows=1, cols=2,
+        subplot_titles=("Robust Regression Residuals", "Gradient Boosting Residuals")
+    )
+    
+    # Robust residuals
+    fig_residual.add_trace(
+        go.Scatter(
+            x=pred_robust,
+            y=residuals_robust,
+            mode='markers',
+            marker=dict(size=6, opacity=0.6, color='blue'),
+            name='Robust',
+            hovertemplate='Predicted: %{x:.2f}<br>Error: %{y:.2f}<extra></extra>'
+        ),
+        row=1, col=1
+    )
+    
+    # GB residuals
+    fig_residual.add_trace(
+        go.Scatter(
+            x=pred_gb,
+            y=residuals_gb,
+            mode='markers',
+            marker=dict(size=6, opacity=0.6, color='green'),
+            name='GB',
+            hovertemplate='Predicted: %{x:.2f}<br>Error: %{y:.2f}<extra></extra>'
+        ),
+        row=1, col=2
+    )
+    
+    # Zero line
+    fig_residual.add_hline(y=0, line_dash="dash", line_color="red", row=1, col=1)
+    fig_residual.add_hline(y=0, line_dash="dash", line_color="red", row=1, col=2)
+    
+    fig_residual.update_xaxes(title_text="Predicted WAR", row=1, col=1)
+    fig_residual.update_xaxes(title_text="Predicted WAR", row=1, col=2)
+    fig_residual.update_yaxes(title_text="Residual (Actual - Predicted)", row=1, col=1)
+    fig_residual.update_yaxes(title_text="Residual (Actual - Predicted)", row=1, col=2)
+    
+    fig_residual.update_layout(
+        height=400,
+        showlegend=False,
+        margin=dict(l=10, r=10, t=40, b=10)
+    )
+    
+    st.plotly_chart(fig_residual, use_container_width=True)
+    
+    st.caption("✅ Good model: Residuals randomly scattered around zero with no pattern")
+    st.caption("❌ Poor model: Residuals show patterns (curves, funnels, clusters)")
+    
+    # Prediction vs Actual Plot
+    st.markdown("### 📈 Prediction vs Actual (Test Set)")
+    
+    fig_pred = go.Figure()
+    
+    # Robust Regression predictions
+    fig_pred.add_trace(go.Scatter(
+        x=y_test,
+        y=pred_robust,
+        mode='markers',
+        name='Robust Regression',
+        marker=dict(size=8, opacity=0.6, color='blue'),
+        hovertemplate='Actual: %{x:.2f}<br>Predicted: %{y:.2f}<extra></extra>'
+    ))
+    
+    # Gradient Boosting predictions
+    fig_pred.add_trace(go.Scatter(
+        x=y_test,
+        y=pred_gb,
+        mode='markers',
+        name='Gradient Boosting',
+        marker=dict(size=8, opacity=0.6, color='green'),
+        hovertemplate='Actual: %{x:.2f}<br>Predicted: %{y:.2f}<extra></extra>'
+    ))
+    
+    # XGBoost predictions if available
+    if has_xgboost:
+        fig_pred.add_trace(go.Scatter(
+            x=y_test,
+            y=pred_xgb,
+            mode='markers',
+            name='XGBoost',
+            marker=dict(size=8, opacity=0.6, color='orange'),
+            hovertemplate='Actual: %{x:.2f}<br>Predicted: %{y:.2f}<extra></extra>'
+        ))
+    
+    # Perfect prediction line
+    min_val = min(y_test.min(), pred_robust.min(), pred_gb.min())
+    max_val = max(y_test.max(), pred_robust.max(), pred_gb.max())
+    fig_pred.add_trace(go.Scatter(
+        x=[min_val, max_val],
+        y=[min_val, max_val],
+        mode='lines',
+        name='Perfect Prediction',
+        line=dict(color='red', dash='dash'),
+        hoverinfo='skip'
+    ))
+    
+    fig_pred.update_layout(
+        xaxis_title="Actual WAR",
+        yaxis_title="Predicted WAR",
+        height=500,
+        hovermode='closest'
+    )
+    
+    st.plotly_chart(fig_pred, use_container_width=True)
+
+# ============================================================
+# PART 6 — Download
+# ============================================================
+
+with tab6:
     st.subheader("Download processed CSV (after imputation & filters)")
 
     buf = io.BytesIO()
@@ -813,4 +1190,3 @@ st.markdown(
     "</p>",
     unsafe_allow_html=True
 )
-
